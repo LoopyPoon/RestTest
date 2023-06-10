@@ -2,6 +2,7 @@ package com.example.RestTest.controller;
 
 import com.example.RestTest.model.Request;
 import com.example.RestTest.model.Response;
+import com.example.RestTest.service.ModifyRequestService;
 import com.example.RestTest.service.MyModifyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class MyController {
 
     private final MyModifyService myModifyService;
+    private final ModifyRequestService modifyRequestService;
 
     @Autowired
-    public MyController(@Qualifier("ModifyErrorMessage") MyModifyService myModifyService) {
+    public MyController(@Qualifier("ModifyErrorMessage") MyModifyService myModifyService,
+                        ModifyRequestService modifyRequestService) {
         this.myModifyService = myModifyService;
+        this.modifyRequestService = modifyRequestService;
     }
 
     @PostMapping(value = "/feedback")
@@ -37,9 +41,11 @@ public class MyController {
                 .errorMessage("")
                 .build();
 
+        modifyRequestService.modifyRq(request);
+
         Response responseAfterModify = myModifyService.modify(response);
 
-        log.info("Исходящий response: " + String.valueOf(response));
+        log.warn("Исходящий response: " + String.valueOf(response));
 
         return new ResponseEntity<>(response, HttpStatus.OK);
 
